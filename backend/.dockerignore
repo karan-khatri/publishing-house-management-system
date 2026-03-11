@@ -1,0 +1,12 @@
+target/server
+target/classes
+target/maven-*
+target/surefire-reports
+target/test-classes
+.git
+.gitignore
+README.md
+run.sh
+*.log
+.DS_Store
+node_modules
