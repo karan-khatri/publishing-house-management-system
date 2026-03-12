@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: swam-postgres
+    environment:
+      POSTGRES_DB: swamdb
+      POSTGRES_USER: swamuser
+      POSTGRES_PASSWORD: swampass
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - swam-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swamuser -d swamdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  swam-backend:
+    build: 
+      context: ./swam-backend
+      dockerfile: Dockerfile
+    container_name: swam-backend
+    environment:
+      - POSTGRESQL_USER=swamuser
+      - POSTGRESQL_PASSWORD=swampass
+      - POSTGRESQL_URL=jdbc:postgresql://postgres-db:5432/swamdb
+      - POSTGRESQL_DATABASE=swamdb
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    networks:
+      - swam-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  swam-frontend:
+    build:
+      context: ./swam-frontend
+      dockerfile: Dockerfile
+    container_name: swam-frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - swam-backend
+    networks:
+      - swam-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4200/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  swam-network:
+    driver: bridge
