@@ -1,0 +1,248 @@
+<div class="max-w-3xl mx-auto p-8 min-h-screen bg-slate-50 md:p-4 sm:p-2">
+  <!-- Header Section -->
+  <div class="bg-white rounded-lg shadow mb-8 p-6 sm:p-4">
+    <div class="flex justify-between items-center gap-4 flex-col sm:flex-row sm:items-start">
+      <h1 class="text-2xl font-semibold text-gray-800 sm:text-xl m-0">
+        {{ getPageTitle() }}
+      </h1>
+      <div class="flex gap-3 w-full sm:w-auto">
+        <app-button
+          variant="secondary"
+          (clickEvent)="onCancel()"
+          [disabled]="isLoading"
+          [aria-disabled]="isLoading"
+          class="flex-1 sm:flex-none">
+          Cancel
+        </app-button>
+        <app-button
+          variant="primary"
+          (clickEvent)="onSubmit()"
+          [loading]="isLoading"
+          [disabled]="isLoading || publicationForm.invalid"
+          class="flex-1 sm:flex-none">
+          {{ getSubmitButtonText() }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading && isEditMode) {
+    <div class="flex flex-col items-center justify-center p-12 bg-white rounded-lg shadow">
+      <div class="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-500">Loading publication...</p>
+    </div>
+  }
+
+  <!-- Form Section -->
+  @if (!isLoading || !isEditMode) {
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="p-8 md:p-6 sm:p-4">
+        <form [formGroup]="publicationForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6 sm:gap-4">
+          
+          <!-- Row 1: Title and ISBN -->
+          <div class="grid grid-cols-2 gap-6 sm:grid-cols-1 sm:gap-4">
+            <div>
+              <app-form-input-field
+                label="Title"
+                formControlName="title"
+                name="title"
+                placeholder="Enter publication title"
+                [required]="true"
+                [control]="publicationForm.get('title')">
+              </app-form-input-field>
+              <!-- Show server error for title -->
+              @if (hasServerError('title')) {
+                <p class="mt-1 text-sm text-red-600">{{ getServerError('title') }}</p>
+              }
+            </div>
+            <div>
+              <app-form-input-field
+                label="ISBN"
+                formControlName="isbn"
+                name="isbn"
+                [required]="true"
+                placeholder="Enter ISBN (10 or 13 digits)"
+                [control]="publicationForm.get('isbn')">
+              </app-form-input-field>
+              <!-- Show server error for ISBN -->
+              @if (hasServerError('isbn')) {
+                <p class="mt-1 text-sm text-red-600">{{ getServerError('isbn') }}</p>
+              }
+            </div>
+          </div>
+
+          <!-- Row 2: Type and Price -->
+          <div class="grid grid-cols-2 gap-6 sm:grid-cols-1 sm:gap-4">
+            <div>
+              <app-form-select-field
+                label="Type"
+                formControlName="type"
+                name="type"
+                [options]="typeOptions"
+                [required]="true"
+                [control]="publicationForm.get('type')">
+              </app-form-select-field>
+              <!-- Show server error for type -->
+              @if (hasServerError('type')) {
+                <p class="mt-1 text-sm text-red-600">{{ getServerError('type') }}</p>
+              }
+            </div>
+            <div>
+              <app-form-select-field
+                label="Status"
+                formControlName="status"
+                name="status"
+                [options]="statusOptions"
+                [required]="true"
+                [control]="publicationForm.get('status')">
+              </app-form-select-field>
+              <!-- Show server error for type -->
+              @if (hasServerError('status')) {
+                <p class="mt-1 text-sm text-red-600">{{ getServerError('type') }}</p>
+              }
+            </div>
+            
+          </div>
+
+          <!-- Row 3: Edition and Pages -->
+          <div class="grid grid-cols-2 gap-6 sm:grid-cols-1 sm:gap-4">
+            <div>
+              <app-form-input-field
+                label="Price"
+                formControlName="price"
+                name="price"
+                type="number"
+                placeholder="Enter price"
+                [min]="0"
+                [step]="0.01"
+                [required]="true"
+                [control]="publicationForm.get('price')">
+              </app-form-input-field>
+              <!-- Show server error for price -->
+              @if (hasServerError('price')) {
+                <p class="mt-1 text-sm text-red-600">{{ getServerError('price') }}</p>
+              }
+            </div>
+            <div>
+              <app-form-input-field
+                label="Edition"
+                formControlName="edition"
+                name="edition"
+                type="number"
+                placeholder="Enter edition"
+                [min]="1"
+                [required]="true"
+                [control]="publicationForm.get('edition')">
+              </app-form-input-field>
+              <!-- Show server error for edition -->
+              @if (hasServerError('edition')) {
+                <p class="mt-1 text-sm text-red-600">{{ getServerError('edition') }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="col-span-full">
+            <div>
+              <app-form-input-field
+                label="Pages"
+                formControlName="pages"
+                name="pages"
+                type="number"
+                placeholder="Enter number of pages"
+                [min]="1"
+                [required]="true"
+                [control]="publicationForm.get('pages')">
+              </app-form-input-field>
+              <!-- Show server error for pages -->
+              @if (hasServerError('pages')) {
+                <p class="mt-1 text-sm text-red-600">{{ getServerError('pages') }}</p>
+              }
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="col-span-full">
+            <app-form-input-field
+              label="Description"
+              formControlName="description"
+              name="description"
+              type="textarea"
+              placeholder="Enter publication description"
+              [required]="true"
+              [rows]="4"
+              [control]="publicationForm.get('description')">
+            </app-form-input-field>
+            <!-- Show server error for description -->
+            @if (hasServerError('description')) {
+              <p class="mt-1 text-sm text-red-600">{{ getServerError('description') }}</p>
+            }
+          </div>
+
+          <!-- Authors Selection -->
+          <div class="col-span-full">
+            <fieldset>
+              <legend class="text-sm font-medium text-gray-700 mb-2">
+                Authors <span class="text-red-600">*</span>
+              </legend>
+              <div class="border rounded-md p-4 bg-gray-50"
+                [class.border-red-600]="publicationForm.get('authorIds')?.invalid && (publicationForm.get('authorIds')?.dirty || publicationForm.get('authorIds')?.touched)"
+                [class.bg-red-50]="publicationForm.get('authorIds')?.invalid && (publicationForm.get('authorIds')?.dirty || publicationForm.get('authorIds')?.touched)">
+                <div class="flex flex-col gap-3 max-h-60 overflow-y-auto">
+                  
+                  @if (authors.length === 0) {
+                    <div class="text-center py-4 text-gray-500">
+                      <p>No authors available</p>
+                      <p class="text-sm">Please add authors first before creating publications</p>
+                    </div>
+                  } @else {
+                    @for (author of authors; track author.id) {
+                      <div class="flex items-start gap-3 hover:bg-gray-100 rounded px-2 py-1">
+                        <input 
+                          type="checkbox"
+                          class="mt-1 w-4 h-4 border-gray-300 rounded cursor-pointer text-blue-600 focus:ring focus:ring-blue-300"
+                          [id]="'author-' + author.id"
+                          [value]="author.id"
+                          [checked]="isAuthorSelected(author.id)"
+                          (change)="onAuthorChange(author.id, $event)">
+                        <label [for]="'author-' + author.id" class="cursor-pointer text-sm text-gray-700 leading-5 flex-1">
+                          {{ author.name }}
+                          <span class="block text-xs text-gray-500 mt-0.5">{{ author.email }}</span>
+                        </label>
+                      </div>
+                    }
+                  }
+                  
+                </div>
+              </div>
+              
+              @if (publicationForm.get('authorIds')?.invalid && (publicationForm.get('authorIds')?.dirty || publicationForm.get('authorIds')?.touched)) {
+                <div class="text-red-600 text-xs font-medium mt-1">
+                  At least one author is required
+                </div>
+              }
+              
+              <!-- Show server error for authors -->
+              @if (hasServerError('authorIds')) {
+                <p class="mt-1 text-sm text-red-600">{{ getServerError('authorIds') }}</p>
+              }
+            </fieldset>
+          </div>
+
+          <!-- Error Messages Summary -->
+          <!-- @if (publicationForm.invalid && publicationForm.touched) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h3 class="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</h3>
+              <ul class="text-sm text-red-700 space-y-1">
+                @for (error of getFormErrors(); track error.field) {
+                  <li>{{ error.message }}</li>
+                }
+              </ul>
+            </div>
+          } -->
+
+        </form>
+      </div>
+    </div>
+  }
+</div>

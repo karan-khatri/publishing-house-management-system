@@ -1,0 +1,22 @@
+<div class="flex flex-col gap-1 w-full">
+  <!-- Label -->
+  @if (label) {
+  <label class="text-sm font-medium text-gray-700 flex items-center gap-1">
+    {{ label }}
+    @if (required) {
+    <span class="text-red-600">*</span>
+    }
+  </label>
+  }
+
+  <!-- Select -->
+  <select
+    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+    [disabled]="disabled" [required]="required" [value]="value ?? ''" (change)="onValueChange($event)">
+
+    <!-- Options -->
+    @for (opt of options; track opt.value) {
+    <option [value]="opt.value" [disabled]="opt.disabled" [selected]="opt.value === value">{{ opt.label }}</option>
+    }
+  </select>
+</div>

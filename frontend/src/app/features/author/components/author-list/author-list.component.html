@@ -1,0 +1,125 @@
+<div class="p-8 max-w-6xl mx-auto sm:p-4">
+  <!-- Header Section -->
+  <div class="flex justify-between items-start mb-6 gap-4 flex-wrap">
+    <div>
+      <h1 class="text-3xl font-semibold text-slate-900 mb-2">Authors</h1>
+      <p class="text-slate-600 text-base">Manage and view all authors in the publishing house</p>
+    </div>
+    <div>
+      <a href="/authors/new"
+        class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        Add New Author
+      </a>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="bg-slate-50 rounded-lg p-6 mb-8">
+    <div class="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-end">
+      <!-- Search Input -->
+      <app-input-field label="Search by name" placeholder="Enter author name..." [value]="searchFilters.query"
+        (valueChange)="onSearchFilterChange('query', $event)">
+      </app-input-field>
+
+      <div class="hidden lg:block">
+
+      </div>
+
+      <!-- Sort By -->
+      <app-select-field label="Sort by" [options]="sortByOptions" [value]="searchFilters.sortBy"
+        (valueChange)="onSearchFilterChange('sortBy', $event.toString())">
+      </app-select-field>
+
+      <!-- Sort Direction -->
+      <app-select-field label="Sort direction" [options]="sortDirectionOptions" [value]="searchFilters.sortDir"
+        (valueChange)="onSearchFilterChange('sortDir', $event.toString())">
+      </app-select-field>
+      <!-- Clear Filters Button -->
+      <div class="flex items-end">
+        <app-button variant="secondary" (click)="clearFilters()">Clear Filters</app-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+  <div class="flex flex-col items-center justify-center py-12 px-6 text-center">
+    <div class="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+    <p class="text-slate-600">Loading authors...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (error && !loading) {
+  <div class="flex justify-center py-12">
+    <div class="text-center max-w-sm">
+      <h3 class="text-red-600 font-semibold mb-2">Error Loading Authors</h3>
+      <p class="text-slate-600 mb-6">{{ error }}</p>
+      <app-button variant="primary" (click)="loadAuthors(pagination, searchFilters)">Try Again</app-button>
+    </div>
+  </div>
+  }
+
+  <!-- Table Section -->
+  @if (!loading && !error) {
+  <div class="overflow-x-auto bg-white shadow rounded-lg">
+    <table class="min-w-full text-sm text-left text-gray-700">
+      <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+        <tr>
+          <th scope="col" class="px-6 py-3">#</th>
+          <th scope="col" class="px-6 py-3">Name</th>
+          <th scope="col" class="px-6 py-3">Email</th>
+          <th scope="col" class="px-6 py-3">Nationality</th>
+          <th scope="col" class="px-6 py-3">Birth Date</th>
+          <th scope="col" class="px-6 py-3">Publications</th>
+          @if (canEditAuthor() || canDeleteAuthor()) {<th scope="col" class="px-6 py-3 text-right">Actions</th>}
+        </tr>
+      </thead>
+      <tbody>
+        <!-- No Results -->
+        @if (authors.length === 0) {
+        <tr>
+          <td colspan="8" class="px-6 py-6 text-center text-gray-500">
+            No authors found. Try adjusting your filters.
+          </td>
+        </tr>
+        }
+
+        <!-- Authors Loop -->
+        @for (author of authors; track author.id) {
+        <tr class="border-b border-gray-200 hover:bg-gray-50 cursor-pointer" (click)="onAuthorView(author.id, $event)">
+          <td class="px-6 py-3">{{ author.id }}</td>
+          <td class="px-6 py-3">{{ author.name }}</td>
+          <td class="px-6 py-3">{{ author.email }}</td>
+          <td class="px-6 py-3">{{ author.nationality }}</td>
+          <td class="px-6 py-3">{{ author.birthDate }}</td>
+          <td class="px-6 py-3 font-semibold text-blue-600">
+            {{ author.publicationCount }} <span class="text-gray-500">publication(s)</span>
+          </td>
+          @if (canEditAuthor() || canDeleteAuthor()) {
+          <td class="px-6 py-3 text-right">
+            @if (canEditAuthor()) {
+            <a href="/authors/{{ author.id }}/edit" class="text-blue-600 hover:underline mr-2"
+              (click)="$event.stopPropagation();">Edit</a>
+            }
+            @if (canDeleteAuthor()) {
+            <button class="text-red-600 hover:underline" (click)="onAuthorDelete(author.id, $event)">Delete</button>
+            }
+          </td>
+          }
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  @if (authors.length > 0) {
+  <div class="mt-4">
+    <app-pagination [config]="pagination" [disabled]="loading" (pageSizeChange)="onPageSizeChange($event)"
+      (pageChange)="onPaginationChange($event)">
+    </app-pagination>
+  </div>
+  }
+  }
+</div>

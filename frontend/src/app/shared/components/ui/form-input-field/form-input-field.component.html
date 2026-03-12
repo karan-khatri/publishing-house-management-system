@@ -1,0 +1,58 @@
+<div class="flex flex-col gap-1 w-full" [class]="extraClasses">
+  <!-- Label -->
+  @if (label) {
+    <label class="text-sm font-medium text-gray-700 flex items-center gap-1">
+      {{ label }}
+      @if (required) {
+        <span class="text-red-600">*</span>
+      }
+    </label>
+  }
+
+  <!-- Input / Textarea -->
+  @switch (type) {
+    @case ('textarea') {
+      <textarea
+        [class]="inputClasses"
+        [placeholder]="placeholder"
+        [required]="required"
+        [rows]="rows"
+        [disabled]="disabled"
+        [value]="value"
+        (input)="onInputChange($event)"
+        (blur)="onInputBlur()"
+        (focus)="onInputFocus()"
+      ></textarea>
+    }
+    @default {
+      <input
+        [type]="type"
+        [class]="inputClasses"
+        [placeholder]="placeholder"
+        [required]="required"
+        [min]="min"
+        [max]="max"
+        [step]="step"
+        [disabled]="disabled"
+        [value]="value"
+        (input)="onInputChange($event)"
+        (blur)="onInputBlur()"
+        (focus)="onInputFocus()"
+      />
+    }
+  }
+
+  <!-- Error -->
+  @if (shouldShowError && currentErrorMessage) {
+    <div class="text-red-600 text-xs">
+      {{ currentErrorMessage }}
+    </div>
+  }
+
+  <!-- Helper -->
+  @else if (helperText) {
+    <div class="text-gray-500 text-xs">
+      {{ helperText }}
+    </div>
+  }
+</div>

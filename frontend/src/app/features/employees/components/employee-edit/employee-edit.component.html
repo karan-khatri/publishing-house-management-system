@@ -1,0 +1,124 @@
+<div class="max-w-3xl mx-auto p-8 min-h-screen bg-slate-50 md:p-4 sm:p-2">
+  <!-- Header Section -->
+  <div class="bg-white rounded-lg shadow mb-8 p-6 sm:p-4">
+    <div class="flex justify-between items-center gap-4 flex-col sm:flex-row">
+      <h1 class="text-2xl font-semibold text-gray-800 sm:text-xl m-0">
+        @if (isEditMode) {
+        Edit Employee
+        } @else {
+        Add New Employee
+        }
+      </h1>
+      <div class="flex gap-3 w-full sm:w-auto">
+        <app-button variant="secondary" (clickEvent)="onCancel()" [disabled]="isLoading"
+          [attr.aria-disabled]="isLoading" class="flex-1 sm:flex-none">
+          Cancel
+        </app-button>
+        <app-button variant="primary" (clickEvent)="onSubmit()" [loading]="isLoading"
+          [disabled]="isLoading || employeeForm.invalid" class="flex-1 sm:flex-none">
+          @if (isEditMode) {
+          Update Employee
+          } @else {
+          Create Employee
+          }
+        </app-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading && isEditMode) {
+  <div class="flex flex-col items-center justify-center p-12 bg-white rounded-lg shadow">
+    <div class="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+    <p class="text-gray-500">Loading employee...</p>
+  </div>
+  }
+
+  <!-- Form Section -->
+  @if (!isLoading || !isEditMode) {
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="p-8 md:p-6 sm:p-4">
+      <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6 sm:gap-4">
+
+        <!-- Row 1: Name and Email -->
+        <div class="grid grid-cols-2 gap-6 sm:grid-cols-1 sm:gap-4">
+          <div>
+            <app-form-input-field label="Name" formControlName="name" name="name" type="text" placeholder="Enter name"
+              [required]="true" [control]="employeeForm.get('name')">
+            </app-form-input-field>
+          </div>
+          <div>
+            <app-form-input-field label="Email Address" formControlName="email" name="email" type="email"
+              placeholder="Enter email address" [required]="true" [control]="employeeForm.get('email')">
+            </app-form-input-field>
+          </div>
+        </div>
+
+        <!-- Row 2: Password (only for create) and Position -->
+        <div class="grid grid-cols-2 gap-6 sm:grid-cols-1 sm:gap-4">
+          @if (!isEditMode) {
+          <div>
+            <app-form-input-field label="Password" formControlName="password" name="password" type="password"
+              placeholder="Enter new password" [required]="true" [control]="employeeForm.get('password')">
+            </app-form-input-field>
+          </div>
+          }
+          <div [class.col-span-2]="isEditMode" [class.sm:col-span-1]="isEditMode">
+            <app-form-input-field label="Position" formControlName="position" name="position" type="text"
+              placeholder="Enter position" [required]="true" [control]="employeeForm.get('position')">
+            </app-form-input-field>
+          </div>
+        </div>
+
+        <!-- Row 3: Department and Phone -->
+        <div class="grid grid-cols-2 gap-6 sm:grid-cols-1 sm:gap-4">
+          <div>
+            <app-form-input-field label="Department" formControlName="department" name="department" type="text"
+              placeholder="Enter department" [required]="true" [control]="employeeForm.get('department')">
+            </app-form-input-field>
+          </div>
+          <div>
+            <app-form-input-field label="Phone" formControlName="phone" name="phone" type="tel"
+              placeholder="Enter phone number" [required]="true" [control]="employeeForm.get('phone')">
+            </app-form-input-field>
+          </div>
+        </div>
+
+        <!-- Row 4: Employee ID and Role -->
+        <div class="grid grid-cols-2 gap-6 sm:grid-cols-1 sm:gap-4">
+          <div>
+            <app-form-input-field label="Employee ID" formControlName="employeeId" name="employeeId" type="text"
+              placeholder="Enter employee ID" [required]="true" [control]="employeeForm.get('employeeId')">
+            </app-form-input-field>
+          </div>
+          <div>
+            <app-form-select-field label="Role" formControlName="roleId" name="roleId" [options]="roleOptions"
+              [required]="true" [control]="employeeForm.get('roleId')">
+            </app-form-select-field>
+          </div>
+        </div>
+
+        <!-- Address (Full Width) -->
+        <div class="col-span-full">
+          <app-form-input-field label="Address" formControlName="address" name="address" type="text"
+            placeholder="Enter address" [required]="true" [control]="employeeForm.get('address')">
+          </app-form-input-field>
+        </div>
+
+        <!-- Error Messages (if any validation errors) -->
+        <!-- @if (employeeForm.invalid && employeeForm.touched && employeeForm.errors?.['length'] !== 0) {
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 class="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</h3>
+          <ul class="text-sm text-red-700 space-y-1">
+            @for (control of getFormErrors(); track control.field) {
+            <li>{{ control.message }}</li>
+            }
+          </ul>
+        </div>
+        } -->
+
+      </form>
+    </div>
+  </div>
+  }
+</div>

@@ -1,0 +1,131 @@
+<div class="max-w-3xl mx-auto p-8 min-h-screen bg-slate-50 md:p-4 sm:p-2">
+  <!-- Header Section -->
+  <div class="bg-white rounded-lg shadow mb-8 p-6 sm:p-4">
+    <div class="flex justify-between items-center gap-4 flex-col sm:flex-row">
+      <h1 class="text-2xl font-semibold text-gray-800 sm:text-xl m-0">
+        @if (isEditMode) {
+          Edit Author
+        } @else {
+          Add New Author
+        }
+      </h1>
+      <div class="flex gap-3 w-full sm:w-auto">
+        <app-button
+          variant="secondary"
+          (clickEvent)="onCancel()"
+          [class.disabled]="isLoading"
+          [attr.aria-disabled]="isLoading"
+          class="flex-1 sm:flex-none">
+          Cancel
+        </app-button>
+        <app-button
+          variant="primary"
+          (clickEvent)="onSubmit()"
+          [loading]="isLoading"
+          [class.disabled]="isLoading || authorForm.invalid"
+          [attr.aria-disabled]="isLoading || authorForm.invalid"
+          class="flex-1 sm:flex-none">
+          @if (isEditMode) {
+            Update Author
+          } @else {
+            Create Author
+          }
+        </app-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading && isEditMode) {
+    <div class="flex flex-col items-center justify-center p-12 bg-white rounded-lg shadow">
+      <div class="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-500">Loading author...</p>
+    </div>
+  }
+
+  <!-- Form Section -->
+  @if (!isLoading || !isEditMode) {
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="p-8 md:p-6 sm:p-4">
+        <form [formGroup]="authorForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6 sm:gap-4">
+          
+          <!-- Row 1: Name and Email -->
+          <div class="grid grid-cols-2 gap-6 sm:grid-cols-1 sm:gap-4">
+            <div>
+              <app-form-input-field 
+                label="Full Name" 
+                formControlName="name"
+                name="name"
+                type="text" 
+                placeholder="Enter author's full name" 
+                [required]="true"
+                [control]="authorForm.get('name')">
+              </app-form-input-field>
+            </div>
+            <div>
+              <app-form-input-field 
+                label="Email Address" 
+                formControlName="email"
+                name="email"
+                type="email" 
+                placeholder="Enter email address" 
+                [required]="true"
+                [control]="authorForm.get('email')">
+              </app-form-input-field>
+            </div>
+          </div>
+
+          <!-- Row 2: Nationality and Birth Date -->
+          <div class="grid grid-cols-2 gap-6 sm:grid-cols-1 sm:gap-4">
+            <div>
+              <app-form-input-field 
+                label="Nationality" 
+                formControlName="nationality"
+                name="nationality"
+                type="text" 
+                placeholder="Enter nationality" 
+                [required]="true"
+                [control]="authorForm.get('nationality')">
+              </app-form-input-field>
+            </div>
+            <div>
+              <app-form-input-field 
+                label="Birth Date" 
+                formControlName="birthDate"
+                name="birthDate"
+                type="date" 
+                [required]="true"
+                [control]="authorForm.get('birthDate')">
+              </app-form-input-field>
+            </div>
+          </div>
+
+          <!-- Row 3: Biography (Full Width) -->
+          <div class="col-span-full">
+            <app-form-input-field
+              label="Biography" 
+              formControlName="biography"
+              name="biography"
+              [rows]="4"
+              placeholder="Enter author's biography..."
+              [control]="authorForm.get('biography')">
+            </app-form-input-field>
+          </div>
+
+          <!-- Error Messages (if any validation errors) -->
+          <!-- @if (authorForm.invalid && authorForm.touched) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h3 class="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</h3>
+              <ul class="text-sm text-red-700 space-y-1">
+                @for (control of getFormErrors(); track control.field) {
+                  <li>{{ control.message }}</li>
+                }
+              </ul>
+            </div>
+          } -->
+
+        </form>
+      </div>
+    </div>
+  }
+</div>

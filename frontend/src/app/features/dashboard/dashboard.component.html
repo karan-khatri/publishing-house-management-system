@@ -1,0 +1,60 @@
+<div class="min-h-screen bg-gray-100">
+  <!-- Content -->
+  <div class="max-w-6xl mx-auto px-5 py-10 space-y-10">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Role Card -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Your Role</h3>
+        @if (currentUser) {
+        <p class="text-xl font-semibold text-gray-800 mb-2">
+          {{ currentUser.role.name }}
+        </p>
+        }
+        <p class="text-sm text-gray-500">Current access level</p>
+      </div>
+
+      <!-- Email Card -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Email</h3>
+        @if (currentUser) {
+        <p class="text-xl font-semibold text-gray-800 mb-2">{{ currentUser.email }}</p>
+        }
+        <p class="text-sm text-gray-500">Registered email address</p>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Getting Started</h2>
+      <p class="text-gray-600 mb-8 leading-relaxed">
+        Welcome to the Publishing House Management System. Your dashboard provides access to various features based on
+        your role.
+      </p>
+
+      <!-- Features Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        @for (card of featureCards; track card.title) {
+        @if (canViewCards(card.title)) {
+        <div
+          class="p-6 border border-gray-200 rounded-lg bg-gray-50 transition cursor-pointer hover:bg-blue-50 hover:border-blue-500 hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col">
+
+          <div>
+            <h4 class="text-base font-medium text-gray-800 mb-3"> @if (canEditCards(card.title)){<span>Manage</span>}
+              @else {<span>View</span>} {{ card.title }}</h4>
+            <p class="text-sm text-gray-600 mb-4">{{ card.description }}</p>
+          </div>
+
+          @if (card.buttonText) {
+          <a href="{{ card.link }}"
+            class="inline-block mt-auto bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
+            {{ card.buttonText }}
+          </a>
+          }
+        </div>
+        }
+        }
+      </div>
+    </div>
+  </div>
+</div>

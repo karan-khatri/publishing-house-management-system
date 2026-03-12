@@ -1,0 +1,67 @@
+<div class="flex flex-col gap-4 w-full">
+
+  <!-- Pagination Info -->
+  @if (showInfo) {
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-slate-600">
+    <span class="font-medium">
+      Showing {{ startIndex }} to {{ endIndex }} of {{ config.totalItems }} entries
+    </span>
+
+    <!-- Page Size Selector -->
+    @if (showPageSizeSelector) {
+    <div class="flex items-center gap-2">
+      <span class="text-slate-600">Show:</span>
+      <select [(ngModel)]="config.limit" [disabled]="disabled" (ngModelChange)="onPageSizeChange($event)"
+        placeholder="Select page size" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-1.5 px-2.5">
+        @for (option of pageSizeSelectOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+      <span class="text-slate-600 shrink-0">per page</span>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Pagination Controls -->
+  @if (totalPages > 1) {
+  <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+
+    <!-- Previous -->
+    <button class="px-3 py-1.5 rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 disabled:opacity-50"
+      [disabled]="isPreviousDisabled" (click)="onPreviousClick()" title="Previous page">
+      ← Previous
+    </button>
+
+    <!-- Page Numbers -->
+    <div class="flex items-center gap-1">
+      <!-- Leading Ellipsis -->
+      @if (visiblePages.length > 0 && visiblePages[0] > 0) {
+      <span class="px-2 text-slate-400">...</span>
+      }
+
+      <!-- Page Buttons -->
+      @for (page of visiblePages; track page) {
+      <button class="px-3 py-1.5 rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 disabled:opacity-50
+              data-[active=true]:bg-blue-600 data-[active=true]:text-white data-[active=true]:border-blue-600"
+        [attr.data-active]="page === config.page" [disabled]="disabled" (click)="onPageClick(page)"
+        [title]="'Go to page ' + (page + 1)">
+        {{ page + 1 }}
+      </button>
+      }
+
+      <!-- Trailing Ellipsis -->
+      @if (visiblePages.length > 0 && visiblePages[visiblePages.length - 1] < totalPages - 1) { <span
+        class="px-2 text-slate-400">...</span>
+        }
+    </div>
+
+    <!-- Next -->
+    <button class="px-3 py-1.5 rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 disabled:opacity-50"
+      [disabled]="isNextDisabled" (click)="onNextClick()" title="Next page">
+      Next →
+    </button>
+
+  </div>
+  }
+</div>

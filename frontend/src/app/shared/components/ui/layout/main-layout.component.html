@@ -1,0 +1,190 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Navigation Bar -->
+  <nav class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        
+        <!-- Left side - Logo and Navigation -->
+        <div class="flex items-center">
+          <!-- Logo -->
+          <div class="flex-shrink-0 flex items-center">
+            <button 
+              (click)="navigateTo('/dashboard')"
+              class="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+              </svg>
+              <span class="text-xl font-bold hidden sm:block">Publishing House</span>
+            </button>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:ml-8 md:flex md:space-x-1">
+            <button
+              (click)="navigateTo('/dashboard')"
+              class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+              Dashboard
+            </button>
+
+            @if (canView('Publications') || canEdit('Publications')) {
+              <button
+                (click)="navigateTo('/publications')"
+                class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                Publications
+              </button>
+            }
+
+            @if (canEdit('Authors') || canView('Authors')) {
+              <button
+                (click)="navigateTo('/authors')"
+                class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                Authors
+              </button>
+            }
+
+            @if (canEdit('Employees') || canView('Employees')) {
+              <button
+                (click)="navigateTo('/employees')"
+                class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                Employees
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Right side - User Menu -->
+        <div class="flex items-center space-x-4">
+          <!-- Mobile menu button -->
+          <button
+            (click)="toggleMobileMenu()"
+            class="md:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              @if (!isMobileMenuOpen) {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              } @else {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              }
+            </svg>
+          </button>
+
+          <!-- User Menu -->
+          <div class="relative">
+            <button
+              (click)="toggleUserMenu()"
+              class="flex items-center space-x-3 text-sm rounded-full p-1 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
+              
+              <!-- User Avatar -->
+              <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                {{ getInitials() }}
+              </div>
+              
+              <!-- User Info (hidden on mobile) -->
+              <div class="hidden md:block text-left">
+                <div class="text-sm font-medium text-gray-900">{{ currentUser?.name }}</div>
+                <div class="text-xs text-gray-500">{{ getRoleDisplayName() }}</div>
+              </div>
+              
+              <!-- Dropdown Arrow -->
+              <svg class="w-4 h-4 text-gray-500 transition-transform" 
+                   [class.rotate-180]="isUserMenuOpen"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+
+            <!-- User Dropdown Menu -->
+            @if (isUserMenuOpen) {
+              <div class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                <div class="p-4 border-b border-gray-200">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-medium">
+                      {{ getInitials() }}
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-gray-900">{{ currentUser?.name }}</div>
+                      <div class="text-sm text-gray-500">{{ currentUser?.email }}</div>
+                      <div class="text-xs text-blue-600 font-medium">{{ getRoleDisplayName() }}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="py-2">
+                  <button
+                    (click)="navigateTo('/dashboard')"
+                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                    <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                    </svg>
+                    Dashboard
+                  </button>
+                </div>
+                
+                <div class="border-t border-gray-200 py-2">
+                  <button
+                    (click)="logout()"
+                    class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                    <svg class="w-4 h-4 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation Menu -->
+      @if (isMobileMenuOpen) {
+        <div class="md:hidden border-t border-gray-200 pt-4 pb-3">
+          <div class="space-y-1">
+            <button
+              (click)="navigateTo('/dashboard')"
+              class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors">
+              Dashboard
+            </button>
+            
+            @if (canView('Publications') || canEdit('Publications')) {
+              <button
+                (click)="navigateTo('/publications')"
+                class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors">
+                Publications
+              </button>
+            }
+            
+            @if (canEdit('Authors') || canView('Authors')) {
+              <button
+                (click)="navigateTo('/authors')"
+                class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors">
+                Authors
+              </button>
+            }
+            
+            @if (canEdit('Employees') || canView('Employees')) {
+              <button
+                (click)="navigateTo('/employees')"
+                class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors">
+                Employees
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="flex-1">
+    <!-- Click outside to close menus -->
+    @if (isUserMenuOpen || isMobileMenuOpen) {
+      <div 
+        class="fixed inset-0 z-40" 
+        (click)="closeMenus()">
+      </div>
+    }
+    
+    <!-- Router Outlet for page content -->
+    <router-outlet></router-outlet>
+  </main>
+</div>

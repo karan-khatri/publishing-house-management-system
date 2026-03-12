@@ -1,0 +1,264 @@
+<div class="max-w-4xl mx-auto p-8 min-h-screen bg-slate-50 md:p-4 sm:p-2">
+  <!-- Header Section -->
+  <div class="bg-white rounded-lg shadow mb-8 p-6 sm:p-4">
+    <div class="flex justify-between items-center gap-4 flex-col sm:flex-row">
+      <div class="flex items-center gap-4">
+        <button
+          (click)="onBackToList()"
+          class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+          [attr.aria-label]="'Back to publications list'">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <h1 class="text-2xl font-semibold text-gray-800 sm:text-xl m-0">
+          @if (publication) {
+            {{ publication.title }}
+          } @else {
+            Publication Details
+          }
+        </h1>
+      </div>
+      
+      @if (publication && !isLoading) {
+        <div class="flex gap-3 w-full sm:w-auto">
+          <app-button
+            variant="secondary"
+            (clickEvent)="onBackToList()"
+            class="flex-1 sm:flex-none">
+            Back to List
+          </app-button>
+          @if (canEditPublication()) {
+            <app-button
+              variant="primary"
+              (clickEvent)="onEdit()"
+              class="flex-1 sm:flex-none">
+              Edit Publication
+            </app-button>
+          }
+          @if (canDeletePublication()) {
+            <app-button
+              variant="danger"
+              (clickEvent)="onDelete()"
+              class="flex-1 sm:flex-none">
+              Delete
+            </app-button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="flex flex-col items-center justify-center p-12 bg-white rounded-lg shadow">
+      <div class="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-500">Loading publication details...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error && !isLoading) {
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="p-12 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Error Loading Publication</h3>
+        <p class="text-gray-600 mb-6">{{ error }}</p>
+        <div class="flex gap-3 justify-center">
+          <app-button variant="secondary" (clickEvent)="onBackToList()">
+            Back to List
+          </app-button>
+          <app-button variant="primary" (clickEvent)="retry()">
+            Try Again
+          </app-button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Publication Details -->
+  @if (publication && !isLoading && !error) {
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="p-8 md:p-6 sm:p-4">
+        
+        <!-- Publication Header -->
+        <div class="flex items-start gap-6 mb-8 pb-8 border-b border-gray-200">
+          <!-- Book Icon -->
+          <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
+            <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+            </svg>
+          </div>
+          
+          <!-- Basic Info -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-3">
+              <h2 class="text-3xl font-bold text-gray-900">{{ publication.title }}</h2>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                    [class]="getStatusClass()">
+                {{ getStatusDisplayName() }}
+              </span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <span class="text-gray-600 font-medium">Authors:</span>
+                <span class="text-gray-900">{{ getAuthorNames() }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                <span class="text-gray-600 font-medium">Type:</span>
+                <span class="text-gray-900">{{ getTypeDisplayName() }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+                <span class="text-gray-600 font-medium">Price:</span>
+                <span class="text-gray-900 font-semibold">{{ getFormattedPrice() }}</span>
+              </div>
+              @if (publication.isbn) {
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                  </svg>
+                  <span class="text-gray-600 font-medium">ISBN:</span>
+                  <span class="text-gray-900 font-mono">{{ publication.isbn }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Description Section -->
+        @if (publication.description) {
+          <div class="mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Description
+            </h3>
+            <div class="bg-gray-50 rounded-lg p-6">
+              <p class="text-gray-700 leading-relaxed whitespace-pre-wrap">{{ publication.description }}</p>
+            </div>
+          </div>
+        }
+
+        <!-- Publication Details Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <!-- Edition -->
+          <div class="bg-blue-50 rounded-lg p-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-blue-600">Edition</p>
+                <p class="text-lg font-bold text-blue-900">{{ publication.edition || 'Not specified' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pages -->
+          @if (publication.pages) {
+            <div class="bg-green-50 rounded-lg p-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-green-600">Pages</p>
+                  <p class="text-lg font-bold text-green-900">{{ publication.pages }}</p>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Publication Date -->
+          <div class="bg-purple-50 rounded-lg p-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V8a1 1 0 011-1h4z"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-purple-600">Created</p>
+                <p class="text-lg font-bold text-purple-900">{{ formatDate(publication.createdAt) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Authors Section -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-.5a4 4 0 110 5.292M21 21v-1a4 4 0 00-3-3.87"></path>
+            </svg>
+            Authors
+            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+              {{ publication.authors.length || 0 }}
+            </span>
+          </h3>
+          
+          @if (publication.authors && publication.authors.length > 0) {
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              @for (author of publication.authors; track author.id) {
+                <a class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors" href="/authors/{{ author.id }}">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                      {{ author.name.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="flex flex-col">
+                      <p class="font-medium text-gray-900">{{ author.name }}</p>
+                      <p class="text-sm text-gray-600">{{ author.email }}</p>
+                    </div>
+                  </div>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+              <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <p class="text-gray-600 font-medium">No Authors Listed</p>
+              <p class="text-gray-500 text-sm mt-1">This publication doesn't have any authors assigned</p>
+            </div>
+          }
+        </div>
+
+        <!-- Metadata Section -->
+        <div class="pt-6 border-t border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Publication ID</label>
+              <p class="text-gray-900 font-mono text-sm bg-gray-50 px-3 py-2 rounded border">{{ publication.id }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
+              <p class="text-gray-900 text-sm">{{ formatDate(publication.updatedAt) }}</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+</div>
