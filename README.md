@@ -61,8 +61,8 @@ That's it! Docker Compose will handle all other dependencies.
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url> - Not Applicable Right Now
-cd swam
+git clone https://github.com/karan-khatri/publishing-house-management-system.git
+cd publishing-house-management-system
 ```
 
 ### 2. Start the Application
